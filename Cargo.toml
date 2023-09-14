@@ -11,12 +11,12 @@ documentation = "https://docs.rs/srx"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-regex = "1"
+fancy-regex = "0.11"
 
 # workaround to use a 'serde' feature which also enables 'serde_regex'
 # see https://github.com/RustCrypto/RSA/pull/41/files
 serde_crate = { package = "serde", version = "1", features = ["derive"], optional = true }
-serde_regex = { version = "1", optional = true }
+serde_fancy_regex = { version = "2" , optional = true }
 
 # used for reading from an XML in SRX format
 serde-xml-rs = { version = "0.4", optional = true }
@@ -29,7 +29,7 @@ quickcheck = "1"
 quickcheck_macros = "1"
 
 [features]
-serde = ["serde_crate", "serde_regex"]
+serde = ["serde_crate", "serde_fancy_regex"]
 from_xml = ["serde", "serde-xml-rs", "thiserror"]
 
 [[bench]]

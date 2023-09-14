@@ -50,7 +50,7 @@ use serde::{Deserialize, Serialize};
 
 use std::{collections::HashMap, ops::Range};
 
-use regex::Regex;
+use fancy_regex;
 
 #[cfg(feature = "from_xml")]
 mod from_xml;
@@ -79,8 +79,8 @@ pub struct Language(pub String);
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 struct Rule {
-    #[cfg_attr(feature = "serde", serde(with = "serde_regex"))]
-    regex: Regex,
+    #[cfg_attr(feature = "serde", serde(with = "serde_fancy_regex"))]
+    regex: fancy_regex::Regex,
     do_break: bool,
 }
 
@@ -92,7 +92,11 @@ impl Rule {
             // generally it is guaranteed that a regex has
             // at least one match, but be lenient about
             // errors in the srx xml files and drop those without
-            x.get(1).map(|x| x.start())
+            if let Ok(capture) = x {
+                capture.get(1).map(|capture| capture.start())
+            } else {
+                None
+            }
         })
     }
 
@@ -183,8 +187,8 @@ impl Rules {
 )]
 #[derive(Debug, Clone)]
 struct LanguageRegex {
-    #[cfg_attr(feature = "serde", serde(with = "serde_regex"))]
-    regex: Regex,
+    #[cfg_attr(feature = "serde", serde(with = "serde_fancy_regex"))]
+    regex: fancy_regex::Regex,
     language: Language,
 }
 
@@ -213,7 +217,7 @@ impl SRX {
         let mut rules = Vec::new();
 
         for item in &self.map {
-            if item.regex.is_match(lang_code.as_ref()) {
+            if item.regex.is_match(lang_code.as_ref()).expect("Error matching with regex") {
                 rules.extend(self.rules.get(&item.language).expect("languagerulename in <languagemap> must have a corresponding entry in <languagerules>").iter().cloned());
                 if !self.cascade {
                     break;

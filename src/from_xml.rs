@@ -1,7 +1,7 @@
 use std::{collections::HashMap, convert::TryFrom, io::Read, str::FromStr};
 
 use super::{utils, Language, LanguageRegex, Rule, SRX};
-use regex::Regex;
+use fancy_regex::Regex;
 use thiserror::Error;
 
 pub fn string_to_bool(string: &str) -> Result<bool, Error> {
@@ -19,7 +19,7 @@ pub fn string_to_bool(string: &str) -> Result<bool, Error> {
 #[cfg(feature = "from_xml")]
 pub enum Error {
     #[error("Error constructing regex: {0}")]
-    RegexError(#[from] regex::Error),
+    RegexError(#[from] fancy_regex::Error),
     #[error("Error reading XML: {0}")]
     XMLError(#[from] serde_xml_rs::Error),
     #[error("invalid SRX: {reason}")]
